@@ -1,0 +1,13 @@
+**/*.csv
+**/*.npz
+**/*.gml
+**/*.xlsx
+**/*.png
+**/*.svg
+**/*.txt
+**/*.ipynb
+**/.ipynb_checkpoints/
+.idea/
+.ipynb_checkpoints/*
+.DS_Store/
+**/.DS_Store
