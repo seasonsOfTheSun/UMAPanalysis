@@ -6,7 +6,6 @@ import graph_coarsening as gc
 import matplotlib.pyplot as plt
 
 import os
-os.chdir('//')
 
 G_nx = nx.read_gml("networks/l1000/similarity.gml")
 G_nx = max(nx.weakly_connected_component_subgraphs(G_nx), key = lambda x:len(x.nodes()))
@@ -21,13 +20,10 @@ Gc_nodes = list(sorted(Gc.nodes()))
 nx.write_gml(Gc, "networks/l1000/coarsened_similarity.gml")
 scipy.sparse.save_npz("networks/l1000/similarity_coarsening_map.npz", C)
 
-
 moas = pd.read_csv("munged_data/moas.csv", index_col = 0)
 moas = moas.reindex(nodes)
 moa_matrix = scipy.sparse.csr_matrix(moas.values)
 
-print(C.shape)
-print(moa_matrix.shape)
 condensed_moas = pd.DataFrame((C * moa_matrix).toarray())
 condensed_moas.columns = moas.columns
 condensed_moas

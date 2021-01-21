@@ -1,11 +1,9 @@
-import pandas as pd
 
 import umap
-
-import numpy as np
 import numba
+import numpy as np
+import pandas as pd
 import networkx as nx
-
 
 def umap_network(df, nn):
     rndstate = np.random.RandomState()
@@ -14,13 +12,12 @@ def umap_network(df, nn):
     num_to_id = dict(enumerate(df.index))
     return nx.relabel_nodes(G, num_to_id.get)
 
-import os
-os.chdir('//')
+if __name__ == '__main__':
+    n = 14
+    #for dataset in ['GDSC','cytodata','lish-moa']:
+    for dataset in ['toy']:
+        print()
+        df = pd.read_csv(f"munged_data/{dataset}/features.csv", index_col=0)
+        G = umap_network(df, n)
+        nx.write_gml(G, f"networks/{dataset}/similarity.gml")
 
-
-n = 14
-for dataset in ['GDSC']:
-    print()
-    df = pd.read_csv(f"munged_data/{dataset}/features.csv", index_col=0)
-    G = umap_network(df, n)
-    nx.write_gml(G, f"networks/{dataset}/similarity.gml")
