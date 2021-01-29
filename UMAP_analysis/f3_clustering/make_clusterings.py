@@ -1,11 +1,11 @@
 import networkx
 import community
-import numpy
 import pandas
+import numpy
 import os
 import re
 
-dataset = 'cytodata'
+dataset = 'lish-moa'
 filenames = os.listdir(f"UMAP_analysis/f3_clustering/noised_networks/{dataset}/")
 scaling_factors  = [re.match('similarity_with_noise_level_(?P<x>.*?).gml',i).groupdict()['x'] for i in filenames]
 
@@ -23,7 +23,7 @@ for scaling_factor in scaling_factors:
 
         except KeyError:
             pass
-
+"""
 
     clustering = community.best_partition(G_u)
     tmp = pandas.Series(clustering)
@@ -34,3 +34,13 @@ for scaling_factor in scaling_factors:
 df = pandas.concat(out, axis = 1)
 df.index.name = "scaling_factor"
 df.to_csv(f"UMAP_analysis/f3_clustering/clusters/UMAP_{dataset}.csv")
+"""
+
+
+def umap_network(df, nn):
+    rndstate = np.random.RandomState()
+    knn_net = umap.umap_.fuzzy_simplicial_set(df.values, nn, rndstate, 'manhattan')
+    G = nx.from_numpy_array(knn_net[0].toarray(), create_using = nx.DiGraph)
+    num_to_id = dict(enumerate(df.index))
+    return nx.relabel_nodes(G, num_to_id.get)
+git add 
