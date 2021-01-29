@@ -8,6 +8,7 @@
 **/*.ipynb
 **/.ipynb_checkpoints/
 **/*~
+**/*.sed_backup
 .idea/
 .ipynb_checkpoints/*
 .DS_Store/
