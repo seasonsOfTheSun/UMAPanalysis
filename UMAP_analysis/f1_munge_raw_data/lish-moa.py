@@ -5,14 +5,14 @@ import numpy as np
 import os
 os.chdir('//')
 
-#df = pd.read_csv("lish-moa/sample_submission.csv", index_col = 0)
-X_unclassified = pd.read_csv("lish-moa/test_features.csv", index_col = 0);
-X_classified = pd.read_csv("lish-moa/train_features.csv", index_col = 0);
+#df = pd.read_csv("data/raw/lish-moa/sample_submission.csv", index_col = 0)
+X_unclassified = pd.read_csv("data/raw/lish-moa/test_features.csv", index_col = 0);
+X_classified = pd.read_csv("data/raw/lish-moa/train_features.csv", index_col = 0);
 X = pd.concat([X_classified, X_unclassified]);
 
 
 
-y_classified = pd.read_csv("lish-moa/train_targets_scored.csv", index_col = 0)
+y_classified = pd.read_csv("data/raw/lish-moa/train_targets_scored.csv", index_col = 0)
 MoAs = y_classified.columns
 known = pd.Series({i:1 for i in y_classified.index})
 
@@ -34,9 +34,9 @@ features = X[[i for i in X.columns if i not in metadata_columns]]
 features_unscaled = features.copy()
 features = features_unscaled / features_unscaled.std(axis = 0)
 
-features.to_csv("munged_data/lish-moa/features.csv")
-features_unscaled.to_csv("munged_data/lish-moa/features_unscaled.csv")
-metadata.to_csv("munged_data/lish-moa/metadata.csv")
-y.to_csv("munged_data/lish-moa/labels.csv")
+features.to_csv("data/intermediate/lish-moa/features.csv")
+features_unscaled.to_csv("data/intermediate/lish-moa/features_unscaled.csv")
+metadata.to_csv("data/intermediate/lish-moa/metadata.csv")
+y.to_csv("data/intermediate/lish-moa/labels.csv")
 
 

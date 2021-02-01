@@ -5,9 +5,9 @@ import numpy as np
 import os
 os.chdir('//')
 
-#df = pd.read_csv("lish-moa/sample_submission.csv", index_col = 0)
-X_unclassified = pd.read_csv("cytodata/validation_data.csv");
-X_classified = pd.read_csv("cytodata/training_data.csv");
+#df = pd.read_csv("data/raw/lish-moa/sample_submission.csv", index_col = 0)
+X_unclassified = pd.read_csv("data/raw/cytodata/validation_data.csv");
+X_classified = pd.read_csv("data/raw/cytodata/training_data.csv");
 
 X_classified['known'] = 1
 X_unclassified['known'] = 0
@@ -43,7 +43,7 @@ features = X[[i for i in X.columns if i not in metadata_columns]]
 features_unscaled = features.copy()
 features = features_unscaled / features_unscaled.std(axis = 0)
 
-features.to_csv("munged_data/cytodata/features.csv")
-features_unscaled.to_csv("munged_data/cytodata/features_unscaled.csv")
-metadata.to_csv("munged_data/cytodata/metadata.csv")
-y.to_csv("munged_data/cytodata/labels.csv")
+features.to_csv("data/intermediate/cytodata/features.csv")
+features_unscaled.to_csv("data/intermediate/cytodata/features_unscaled.csv")
+metadata.to_csv("data/intermediate/cytodata/metadata.csv")
+y.to_csv("data/intermediate/cytodata/labels.csv")

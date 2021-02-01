@@ -6,7 +6,7 @@ import numpy as np
 import os
 os.chdir('//')
 
-dataset = "cytodata"
+dataset = "data/raw/cytodata"
 
 for dataset in ['lish-moa', 'cytodata', 'GDSC']:
     G = nx.read_gml(f"networks/{dataset}/similarity.gml")

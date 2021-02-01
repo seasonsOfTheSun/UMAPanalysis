@@ -3,7 +3,7 @@ import numpy as np
 import os
 os.chdir('//')
 
-dataset = "lish-moa"
+dataset = "data/raw/lish-moa"
 
 for dataset in ['lish-moa', 'cytodata', 'GDSC']:
     metadata = pd.read_csv(f"munged_data/{dataset}/metadata.csv",  index_col = 0)

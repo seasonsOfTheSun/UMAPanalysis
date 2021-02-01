@@ -2,7 +2,7 @@ import pandas
 import scipy.stats
 
 method = "UMAP"
-dataset = "lish-moa"
+dataset = "data/raw/lish-moa"
 clusters = pandas.read_csv(f"UMAP_analysis/f3_clustering/clusters/{method}_{dataset}.csv",index_col=0)
 metadata = pandas.read_csv(f"munged_data/{dataset}/metadata.csv",index_col=0)
 target = metadata.target

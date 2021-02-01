@@ -5,8 +5,8 @@ import numpy as np
 import os
 os.chdir('//')
 
-X1 = pd.read_excel("GDSC/GDSC1_fitted_dose_response_25Feb20.xlsx")
-X2 = pd.read_excel("GDSC/GDSC2_fitted_dose_response_25Feb20.xlsx")
+X1 = pd.read_excel("data/raw/GDSC/GDSC1_fitted_dose_response_25Feb20.xlsx")
+X2 = pd.read_excel("data/raw/GDSC/GDSC2_fitted_dose_response_25Feb20.xlsx")
 
 X1_t = X1[["CELL_LINE_NAME", "DRUG_NAME", "LN_IC50"]]
 X1_t = X1_t.groupby(["CELL_LINE_NAME", "DRUG_NAME"]).sum()
@@ -32,7 +32,7 @@ features = X[[i for i in X.columns if i not in metadata_columns]]
 features_unscaled = features.copy()
 features = features_unscaled / features_unscaled.std(axis = 0)
 
-features.to_csv("munged_data/GDSC/features.csv")
-features_unscaled.to_csv("munged_data/GDSC/features_unscaled.csv")
-metadata.to_csv("munged_data/GDSC/metadata.csv")
-#y.to_csv("munged_data/GDSC/labels.csv")
+features.to_csv("data/intermediate/GDSC/features.csv")
+features_unscaled.to_csv("data/intermediate/GDSC/features_unscaled.csv")
+metadata.to_csv("data/intermediate/GDSC/metadata.csv")
+#y.to_csv("data/intermediate/GDSC/labels.csv")
