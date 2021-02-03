@@ -9,7 +9,7 @@ from UMAP_analysis.f2_build_networks.make_network import umap_network
 """
 n = 14
 for dataset in ['lish-moa']:
-    df = pd.read_csv(f"munged_data/{dataset}/features.csv", index_col=0)
+    df = pd.read_csv(f"data/intermediate/{dataset}/features.csv", index_col=0)
     deviations = df.std()
     for scaling_factor in np.linspace(0,1,9):
         G = umap_network(df+scaling_factor*deviations, n)
@@ -18,7 +18,7 @@ for dataset in ['lish-moa']:
 
 n = 14
 for dataset in ['lish-moa']:
-    df = pd.read_csv(f"munged_data/{dataset}/features.csv", index_col=0)
+    df = pd.read_csv(f"data/intermediate/{dataset}/features.csv", index_col=0)
     for scaling_factor in np.linspace(0,1,9):
         deviations = df.std()*np.random.randn(*noise_df.shape)
         noise_df = df+scaling_factor*deviations
