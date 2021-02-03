@@ -5,11 +5,11 @@ import time
 
 os.chdir('/Users/jhancock/UMAP_analysis/')
 
-classes = pd.read_csv(f"munged_data/{dataset}/labels.csv", index_col = 0)
-metadata = pd.read_csv(f"munged_data/{dataset}/metadata.csv", index_col = 0)
+classes = pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col = 0)
+metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata.csv", index_col = 0)
 metadata["known"] = metadata.known.astype('bool')
 
-classes_test = pd.read_csv(f"munged_data/{dataset}/labels.csv", index_col = 0)
+classes_test = pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col = 0)
 similarity = nx.read_gml(f"networks/{dataset}/similarity.gml")
 
 out = []

@@ -6,7 +6,7 @@ os.chdir('//')
 dataset = "data/raw/lish-moa"
 
 for dataset in ['lish-moa', 'cytodata', 'GDSC']:
-    metadata = pd.read_csv(f"munged_data/{dataset}/metadata.csv",  index_col = 0)
+    metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata.csv",  index_col = 0)
 
     to_choose_from = metadata.index[metadata.known == 1]
     test = np.random.choice(to_choose_from, int(len(to_choose_from)/3), replace=False)

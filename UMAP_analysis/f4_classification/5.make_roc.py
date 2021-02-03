@@ -36,7 +36,7 @@ def roc_curve(truth, predicted_values, steps = 500):
 import os
 os.chdir('//')
 dataset = "l1000"
-truth = pd.read_csv(f"munged_data/{dataset}/labels.csv", index_col=0)
+truth = pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col=0)
 
 propagation_prediction = pd.read_csv(f"predictions/{dataset}/predicted_by_propagation.csv", index_col=0)
 random_forest_prediction = pd.read_csv(f"predictions/{dataset}/random_forest_predictions.csv", index_col=0)
