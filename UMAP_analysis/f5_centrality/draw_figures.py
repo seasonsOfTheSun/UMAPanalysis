@@ -9,8 +9,8 @@ centralities.name = 'centrality'
 scipy.stats.mannwhitneyu(centralities[metadata.cp_type == 'trt_cp'], centralities[metadata.cp_type != 'trt_cp'])
 
 nodes = G.nodes()
-labels = pd.read_csv(f"munged_data/{dataset}/labels.csv", index_col = 0)
-metadata = pd.read_csv(f"munged_data/{dataset}/metadata_matrix.csv", index_col = 0)
+labels = pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col = 0)
+metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata_matrix.csv", index_col = 0)
 
 import matplotlib.pyplot as plt
 import numpy as np

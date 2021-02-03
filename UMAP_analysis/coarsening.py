@@ -19,4 +19,3 @@ def condense(C, nodes):
     moa_matrix = scipy.sparse.csr_matrix(moas.values)
     condensed_moas = pd.DataFrame((C * moa_matrix).toarray())
     return condensed_moas
-
