@@ -1,7 +1,41 @@
-bad
+UMAP Analysis
 ==============================
 
-This is a bad project. Delete it ASAP
+Ever wanted to directly cluster on the output of UMAP, but felt too guilty too try it?
+
+Ever wanted to say "look, those clusters are obviously distinct, they're seperated on the UMAP plot!"
+
+Well now you can use UMAP in your downstream analysis to you hearts' content, without having to throw away huge amounts of information in the process of making a 2D representation of your data.
+
+UMAP analysis akes a similarity network for you data that using UMAP as a feature selection/manifold learning tool (these two concepts are much more closely linked than they seem!).
+
+Then you can use alll the tools of network science to further analyse your data!
+
+To get started download or pull this github page, navigate into the directory and:
+```bash
+pip install .
+```
+
+Then get your data into the necessary format, a pandas dataframe with an index representing the names of your datapoints that will become the names for their representative nodes for the network.
+
+If you don't like pandas and prefer raw numpy arrays, you can fix this is a couple of lines, like this:
+
+````python
+import pandas as pd
+df = pd.DataFrame(yourArray, index = yourDataPointsName)
+```
+
+Now the interesting step:
+
+```python
+from UMAP_analysis import umap_network
+G = umap_network(df)
+```
+
+G will be a networkx network representing the similarity between the datapoints.This step might take a minute or so. My dataframe with 10,000 rows and 20 columns takes a couple of minutes.
+
+After this, play around with the resulting network.
+
 
 Project Organization
 ------------
