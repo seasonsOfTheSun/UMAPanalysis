@@ -1,18 +1,18 @@
 import networkx as nx
+import pandas
 import community
 import sys
-
+from UMAP_analysis.core import make_undirected
 
 network_filename = sys.argv[1]
+network_name = network_filename.split("/")[-1].split(".")[0]
 
-
-G = nx.read_gml(network_filename)
+G_dir = nx.read_gml(network_filename)
+G = make_undirected(G_dir)
 clustering = community.best_partition(G)
-tmp = pandas.Series(clustering)
-tmp.name = scaling_factor
-out.append(tmp)
+out = pandas.Series(clustering)
+print(network_name)
 
 
-df = pandas.concat(out, axis = 1)
-df.index.name = "scaling_factor"
-df.to_csv(f"UMAP_analysis/data/processed/clusters/louvain_{dataset}_{noise_level}.csv)
+
+out.to_csv(f"data/processed/clusters/louvain_{network_name}.csv")
