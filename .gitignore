@@ -9,6 +9,7 @@
 **/.ipynb_checkpoints/
 **/*~
 **/*.sed_backup
+**/.#*.py
 .idea/
 .ipynb_checkpoints/*
 .DS_Store/
