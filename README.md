@@ -5,9 +5,9 @@ Ever wanted to directly cluster on the output of UMAP, but felt too guilty too t
 
 Ever wanted to say "look, those clusters are obviously distinct, they're seperated on the UMAP plot!"
 
-Well now you can use UMAP in your downstream analysis to you hearts' content, without having to throw away huge amounts of information in the process of making a 2D representation of your data.
+Now, you too can use UMAP in your downstream analysis to you hearts' content, without having to throw away huge amounts of information in the process of making a 2D representation of your data.
 
-UMAP analysis akes a similarity network for you data that using UMAP as a feature selection/manifold learning tool (these two concepts are much more closely linked than they seem!).
+UMAP analysis makes a similarity network for you data that using UMAP as a feature selection/manifold learning tool (these two concepts are much more closely linked than they seem!).
 
 Then you can use alll the tools of network science to further analyse your data!
 
