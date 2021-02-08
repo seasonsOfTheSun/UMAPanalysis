@@ -14,7 +14,7 @@ def umap_network(df, nn):
     num_to_id = dict(enumerate(df.index))
     return nx.relabel_nodes(G, num_to_id.get)
 
-def scaled_laplacian(G, nodes = None):
+def scaled_transition(G, nodes = None):
     if nodes == None:
         nodes = list(G.nodes())
 
@@ -73,9 +73,10 @@ def nearest_neighbor(G,labels):
     for node in G.nodes():
         neighbors = list(G[node].keys())
         neighbor_labels = labels.loc[neighbors]
-        if len(known_neighbors) > 0:
-            nearest_known_neighbor = max(neighbors, key=lambda x: similarity[node][x]['weight'])
-            prediction = labels.loc[nearest_known_neighbor]
+
+        if len(neighbors) > 0:
+            nearest_neighbor = max(neighbors, key=lambda x: G[node][x]['weight'])
+            prediction = labels.loc[nearest_neighbor]
         else:
             prediction = 0
         out[node] = prediction
