@@ -1,1 +1,1 @@
-from UMAP_analysis.core import *
+from UMAP_analysis.core import umap_network
