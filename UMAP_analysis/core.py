@@ -6,10 +6,10 @@ import networkx as nx
 import scipy.sparse
 
 
-def umap_network(df, nn):
+def umap_network(df, nn, metric = 'manhattan'):
     """ """
     rndstate = np.random.RandomState()
-    knn_net = umap.umap_.fuzzy_simplicial_set(df.values, nn, rndstate, 'manhattan')
+    knn_net = umap.umap_.fuzzy_simplicial_set(df.values, nn, rndstate, metric)
     G = nx.from_numpy_array(knn_net[0].toarray(), create_using = nx.DiGraph)
     num_to_id = dict(enumerate(df.index))
     return nx.relabel_nodes(G, num_to_id.get)
