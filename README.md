@@ -21,7 +21,7 @@ Then get your data into the necessary format, a pandas dataframe with an index r
 
 If you don't like pandas and prefer raw numpy arrays, you can fix this is a couple of lines, like this:
 
-````python
+```python
 import pandas as pd
 df = pd.DataFrame(yourArray, index = yourDataPointsName)
 ```
