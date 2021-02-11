@@ -14,6 +14,7 @@ Then you can use alll the tools of network science to further analyse your data!
 
 To get started download or pull this github page, navigate into the directory and:
 ```bash
+pip install -r requirements.txt
 pip install .
 ```
 
