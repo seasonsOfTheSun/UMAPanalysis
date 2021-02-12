@@ -33,4 +33,4 @@ nx.draw_networkx(G,
                  ax = ax
                 )
 
-fig.savefig(f"figures/networks/{dataset}/{name}_spring_layout.svg")
+fig.savefig(f"figures/networks/{dataset}/{name}_spring_layout_{ev_1}_{ev_2}.svg")
