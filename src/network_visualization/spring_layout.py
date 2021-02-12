@@ -7,15 +7,15 @@ from UMAP_analysis.core import make_undirected
 import matplotlib.pyplot as plt
 
 path  = sys.argv[1]
-m = re.match(".*/networks/(?P<dataset>.*?)/(?P<name>.*?).gml", path)
+m = re.match("networks/(?P<dataset>.*?)/(?P<name>.*?).gml", path)
 dataset = m.groupdict()['dataset']
 name = m.groupdict()['name']
 
 G = nx.read_gml(path)
 G = make_undirected(G)
-ev = pd.read_csv(f"../networks/{dataset}/eigenvectors/{name}.csv", index_col = 0)
+ev = pd.read_csv(f"networks/{dataset}/eigenvectors/{name}.csv", index_col = 0)
 e_values = ev.loc["lambda"]
-ev.loc[[i for i in ev.index if i != "lambda"]]
+ev = ev.loc[[i for i in ev.index if i != "lambda"]]
 
 e_1 = sys.argv[2]
 e_2 = sys.argv[3]
