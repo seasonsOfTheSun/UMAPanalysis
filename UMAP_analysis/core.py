@@ -86,5 +86,5 @@ def nearest_neighbor(G,labels):
 
 def largest_connected_component(G):
     l = nx.weakly_connected_components(G)
-    s = max(l,key=lambda x:x.degree())
-    return G.subgraph(s)
+    return max(l,key=lambda x:len(x))
+
