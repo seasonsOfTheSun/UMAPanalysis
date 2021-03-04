@@ -27,4 +27,4 @@ for moa in training_labels.columns:
 
 
 df = pd.concat(df, axis=1)
-df.to_csv(f"data/processed/predictions/{dataset}/random_forest_predictions.csv")
+df.to_csv(f"data/processed/predictions/{dataset}/random_forest.csv")
