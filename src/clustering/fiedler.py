@@ -4,14 +4,20 @@ import numpy as np
 
 filename = sys.argv[1]
 evector = pd.read_csv(filename, index_col = 0)
-dataset = filename.split("/")[-3]
+dataset = filename.split("/")[2]
 
-n = np.argmax(evector.loc["lambda", evector.loc["lambda"] < 1])
+network_filename = sys.argv[1]
+m = re.match("networks/(?P<dataset>.*?)/eigenvectors/(?P<name>.*?).csv", network_filename)
+dataset = m.groupdict()['dataset']
+name = m.groupdict()['name']
+
+evec_keys = sorted(evector.columns, key=lambda i:evector.loc["lambda",i])
+n = evec_keys[-2]
 fiedler = evector[n]
 del fiedler['lambda']
 
 
-filename_out = "fiedler_"+filename.split("/")[-1].split(".")[0]+".csv"
+filename_out = "fiedler_"+name+".csv"
 
 def closest_integer(x):
     if x >= 0.5:
@@ -20,4 +26,7 @@ def closest_integer(x):
        return 0
 median = fiedler.median()
 df = (fiedler > median).astype(int)
-df.to_csv(f"data/processed/clusters/{dataset}/"+filename_out, header = False)
+df.to_csv(f"data/processed/clusters/{dataset}/median_" + filename_out, header = False)
+
+df = (fiedler > 0).astype(int)
+df.to_csv(f"data/processed/clusters/{dataset}/sign_" + filename_out, header = False) 
