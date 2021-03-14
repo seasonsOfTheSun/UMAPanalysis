@@ -4,13 +4,13 @@ import scipy.stats
 import numpy
 
 
-network_filename = sys.argv[1]
-m = re.match("data/processed/predictions/(?P<dataset>.*?)/(?P<name>.*?).csv", network_filename)
+filename = sys.argv[1]
+m = re.match("data/processed/clusters/(?P<dataset>.*?)/(?P<name>.*?).csv", filename)
 dataset = m.groupdict()['dataset']
 name = m.groupdict()['name']
 
 
-clusters = pandas.read_csv(f"data/processed/clusters/{dataset}/{method}",index_col=0)
+clusters = pandas.read_csv(filename, index_col=0)
 metadata = pandas.read_csv(f"data/intermediate/{dataset}/metadata.csv"  ,index_col=0)
 target = metadata.target
 
