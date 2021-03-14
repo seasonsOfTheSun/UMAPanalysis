@@ -14,15 +14,18 @@ labels=pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col=0)
 metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata.csv", index_col=0)
 features = pd.read_csv(f"data/intermediate/{dataset}/features.csv", index_col=0)
 
-train = pd.read_csv(f"data/intermediate/{dataset}/train.csv")["0"].values
-testing =  pd.read_csv(f"data/intermediate/{dataset}/test.csv")["0"].values
+
+
+train = pd.read_csv(f"data/intermediate/{dataset}/train.csv", header = None)[0].values
+test  = pd.read_csv(f"data/intermediate/{dataset}/test.csv", header = None)[0].values
 
 
 nodes = list(G.nodes())
-labels = labels.loc[list(set(train))].reindex(labels.index).fillna(0).astype('float64')
+labels = labels.loc[train].reindex(labels.index).fillna(0).astype('float64')
 
 
 propagator=scaled_transition(G, nodes=nodes)
 df,df_time=propagate(propagator, nodes, labels)
-df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}.csv")
-
+df = df.loc[test]
+df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}_training_set_1.csv")
+df_time.to_csv(f"data/processed/prediction_times/{dataset}/propagation_{name}_training_set_1.csv")
