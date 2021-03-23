@@ -18,13 +18,14 @@ y_unclassified = pd.DataFrame(y_unclassified)
 y_unclassified.columns = MoAs
 y_unclassified.index= X_unclassified.index
 temp = pd.Series({i:0 for i in y_unclassified.index})
-known  = pd.concat([known, temp])
+#known  = pd.concat([known, temp])
 y = pd.concat([y_classified, y_unclassified]);
 
 
 metadata_columns = ["cp_type", "cp_time", "cp_dose"]
 metadata = X[metadata_columns]
-metadata["known"] = known
+metadata["known"] = (y>0).any(axis = 1)
+metadata["target"] = y.idxmax(axis = 1)
 
 
 features = X[[i for i in X.columns if i not in metadata_columns]]
@@ -32,9 +33,9 @@ features_unscaled = features.copy()
 features = features_unscaled / features_unscaled.std(axis = 0)
 
 
+
 features.to_csv("data/intermediate/lish-moa/features.csv")
 features_unscaled.to_csv("data/intermediate/lish-moa/features_unscaled.csv")
 metadata.to_csv("data/intermediate/lish-moa/metadata.csv")
 y.to_csv("data/intermediate/lish-moa/labels.csv")
-
 

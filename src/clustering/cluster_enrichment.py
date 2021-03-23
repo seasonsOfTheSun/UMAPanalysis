@@ -15,7 +15,6 @@ for filename in os.listdir(f"../data/processed/clusters/{dataset}/"):
     methods |= {method}
 
 
-
 metadata = pandas.read_csv(f"../data/intermediate/{dataset}/metadata.csv",index_col=0)
 target = metadata.target
 target = target[metadata.known==1]

@@ -17,4 +17,5 @@ G = make_undirected(G_dir)
 clustering = community.best_partition(G)
 out = pandas.Series(clustering)
 
-out.to_csv(f"data/processed/clusters/{dataset}/louvain_{name}.csv")
+
+out.to_csv(f"data/processed/clusters/{dataset}/louvain_{name}.csv", header = None)

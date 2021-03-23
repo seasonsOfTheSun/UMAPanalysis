@@ -2,8 +2,6 @@
 import pandas as pd
 import numpy as np
 
-import os
-os.chdir('//')
 
 X1 = pd.read_excel("data/raw/GDSC/GDSC1_fitted_dose_response_25Feb20.xlsx")
 X2 = pd.read_excel("data/raw/GDSC/GDSC2_fitted_dose_response_25Feb20.xlsx")

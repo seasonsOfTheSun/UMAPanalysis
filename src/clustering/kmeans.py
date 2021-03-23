@@ -16,4 +16,4 @@ df = df+scaling_factor*np.random.randn(*df.shape)
 import sklearn.cluster
 _,clusters,_ = sklearn.cluster.k_means(df,2)
 clusters = pd.Series(clusters, index = df.index)
-clusters.to_csv(f"data/processed/clusters/{dataset}/kmeans_noise_percent_{noise_percent}.csv")
+clusters.to_csv(f"data/processed/clusters/{dataset}/kmeans_noise_percent_{noise_percent}.csv", header = None)

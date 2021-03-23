@@ -9,6 +9,14 @@ m = re.match("networks/(?P<dataset>.*?)/(?P<name>.*?).gml", network_filename)
 dataset = m.groupdict()['dataset']
 name = m.groupdict()['name']
 
+
+steps_str = sys.argv[2]
+recall_1000 = sys.argv[3]
+
+steps = int(steps_str)
+recall = int(recall_1000)/1000
+
+
 G=nx.read_gml(network_filename)
 labels=pd.read_csv(f"data/intermediate/{dataset}/labels.csv", index_col=0)
 metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata.csv", index_col=0)
@@ -25,7 +33,8 @@ labels = labels.loc[train].reindex(labels.index).fillna(0).astype('float64')
 
 
 propagator=scaled_transition(G, nodes=nodes)
-df,df_time=propagate(propagator, nodes, labels)
+df,df_time=propagate(propagator, nodes, labels, steps, recall)
 df = df.loc[test]
-df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}_training_set_1.csv")
-df_time.to_csv(f"data/processed/prediction_times/{dataset}/propagation_{name}_training_set_1.csv")
+df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}_steps_{steps_str}_recall_{recall_1000}_training_set_1.csv")
+df_time.to_csv(f"data/processed/prediction_times/{dataset}/propagation_{name}_steps_{steps_str}_recall_{recall_1000}_training_set_1.csv")
+

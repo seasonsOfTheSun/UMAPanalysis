@@ -19,4 +19,4 @@ import sklearn.cluster
 model = sklearn.cluster.AgglomerativeClustering(n_clusters=2)
 clusters = model.fit_predict(df)
 clusters = pd.Series(clusters, index = df.index)
-clusters.to_csv(f"data/processed/clusters/{dataset}/agglomerative_noise_percent_{noise_percent}.csv")
+clusters.to_csv(f"data/processed/clusters/{dataset}/agglomerative_noise_percent_{noise_percent}.csv", header = None)

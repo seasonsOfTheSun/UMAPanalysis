@@ -2,7 +2,7 @@ import pandas
 import sys
 import scipy.stats
 import numpy
-
+import re
 
 filename = sys.argv[1]
 m = re.match("data/processed/clusters/(?P<dataset>.*?)/(?P<name>.*?).csv", filename)
@@ -10,7 +10,7 @@ dataset = m.groupdict()['dataset']
 name = m.groupdict()['name']
 
 
-clusters = pandas.read_csv(filename, index_col=0)
+clusters = pandas.read_csv(filename, index_col=0, header = None)
 metadata = pandas.read_csv(f"data/intermediate/{dataset}/metadata.csv"  ,index_col=0)
 target = metadata.target
 
@@ -50,11 +50,18 @@ def cross_odds_ratio(dict1, dict2, N):
 def bonferroni(enrichments):
     return enrichments * enrichments.size
 
-c = cluster_dict(clusters["0"])
-d = cluster_dict(target)
 
-n = sum(metadata.known==1)
-df = bonferroni(cross_enrichment(c,d,n))
+enrichment = []
+odds = []
+for clust in clusters.columns[2]:
+    c = cluster_dict(clusters[clust])
+    d = cluster_dict(target)
+    n = sum(metadata.known==1)
+    enrichment.append(bonferroni(cross_enrichment(c,d,n)))
+    odds.append(cross_odds_ratio(c,d,n))
+    
+df = pd.concat(enrichment, axis = 1)
 df.to_csv(f"data/processed/cluster_enrichments/{dataset}/enrichments_{name}.csv")
-df = cross_odds_ratio(c,d,n)
+
+df = pd.concat(odds, axis = 1)
 df.to_csv(f"data/processed/cluster_enrichments/{dataset}/odds_ratios_{name}.csv")
