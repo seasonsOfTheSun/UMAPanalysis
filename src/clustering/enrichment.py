@@ -51,16 +51,16 @@ def bonferroni(enrichments):
     return enrichments * enrichments.size
 
 
-enrichment = []
+enrichment_list = []
 odds = []
-for clust in clusters.columns[2]:
+for clust in clusters.columns:
     c = cluster_dict(clusters[clust])
     d = cluster_dict(target)
     n = sum(metadata.known==1)
-    enrichment.append(bonferroni(cross_enrichment(c,d,n)))
+    enrichment_list.append(bonferroni(cross_enrichment(c,d,n)))
     odds.append(cross_odds_ratio(c,d,n))
     
-df = pd.concat(enrichment, axis = 1)
+df = pd.concat(enrichment_list, axis = 1)
 df.to_csv(f"data/processed/cluster_enrichments/{dataset}/enrichments_{name}.csv")
 
 df = pd.concat(odds, axis = 1)
