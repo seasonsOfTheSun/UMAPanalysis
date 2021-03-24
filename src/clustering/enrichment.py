@@ -1,4 +1,4 @@
-import pandas
+import pandas as pd
 import sys
 import scipy.stats
 import numpy
@@ -10,8 +10,8 @@ dataset = m.groupdict()['dataset']
 name = m.groupdict()['name']
 
 
-clusters = pandas.read_csv(filename, index_col=0, header = None)
-metadata = pandas.read_csv(f"data/intermediate/{dataset}/metadata.csv"  ,index_col=0)
+clusters = pd.read_csv(filename, index_col=0, header = None)
+metadata = pd.read_csv(f"data/intermediate/{dataset}/metadata.csv"  ,index_col=0)
 target = metadata.target
 
 
@@ -32,7 +32,7 @@ def cross_enrichment(dict1, dict2, N):
         out[k1]={}
         for k2,v2 in dict2.items():
             out[k1][k2] = enrichment(v1,v2,N)
-    return pandas.DataFrame(out)
+    return pd.DataFrame(out)
 
 def odds_ratio(set1, set2, N):
     num = len(set1&set2)*len(set2)
@@ -45,7 +45,7 @@ def cross_odds_ratio(dict1, dict2, N):
         out[k1]={}
         for k2,v2 in dict2.items():
             out[k1][k2] = odds_ratio(v1,v2,N)
-    return pandas.DataFrame(out)
+    return pd.DataFrame(out)
 
 def bonferroni(enrichments):
     return enrichments * enrichments.size
