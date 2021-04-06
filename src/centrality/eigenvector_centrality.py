@@ -1,3 +1,4 @@
+
 import networkx as nx
 import pandas as pd
 import sys
@@ -11,7 +12,10 @@ name = m.groupdict()['name']
 
 
 G = nx.read_gml(network_filename)
+
+G = G.to_undirected()
+
 centralities = pd.Series(nx.eigenvector_centrality(G))
 centralities.name = name
 
-centralities.to_csv(f"data/processed/predictions/eigenvector_centralities/{dataset}/{name}.csv")
+centralities.to_csv(f"data/processed/eigenvector_centralities/{dataset}/{name}.csv")
