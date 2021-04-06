@@ -2,7 +2,7 @@ import sys
 import re
 import pandas as pd
 import networkx as nx
-from UMAP_analysis.core import scaled_transition, largest_connected_component, propagate
+from UMAP_analysis.core import scaled_transition, largest_connected_component, random_walk
 
 network_filename = sys.argv[1]
 m = re.match("networks/(?P<dataset>.*?)/(?P<name>.*?).gml", network_filename)
@@ -11,10 +11,10 @@ name = m.groupdict()['name']
 
 
 steps_str = sys.argv[2]
-recall_1000 = sys.argv[3]
+restart_1000 = sys.argv[3]
 
 steps = int(steps_str)
-recall = int(recall_1000)/1000
+restart = int(restart_1000)/1000
 
 
 G=nx.read_gml(network_filename)
@@ -33,8 +33,8 @@ labels = labels.loc[train].reindex(labels.index).fillna(0).astype('float64')
 
 
 propagator=scaled_transition(G, nodes=nodes)
-df,df_time=propagate(propagator, nodes, labels, steps, recall)
+df,df_time=random_walk(propagator, nodes, labels, steps, restart)
 df = df.loc[test]
-df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}_steps_{steps_str}_recall_{recall_1000}_training_set_1.csv")
-df_time.to_csv(f"data/processed/prediction_times/{dataset}/propagation_{name}_steps_{steps_str}_recall_{recall_1000}_training_set_1.csv")
+df.to_csv(f"data/processed/predictions/{dataset}/propagation_{name}_steps_{steps_str}_restart_{restart_1000}_training_set_1.csv")
+df_time.to_csv(f"data/processed/prediction_times/{dataset}/propagation_{name}_steps_{steps_str}_restart_{restart_1000}_training_set_1.csv")
 
