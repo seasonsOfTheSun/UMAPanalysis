@@ -1,8 +1,13 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
 
 def true_positive_rate(truth, predicted):
+    truth = np.array([i != 0 for i in truth])
     return sum(truth & predicted) / sum(truth)
 
 def false_positive_rate(truth, predicted):
+    truth = np.array([i != 0 for i in truth])
     return sum(~truth & predicted) / sum(~truth)
 
 def roc_curve(truth, predicted_values, steps = 500):

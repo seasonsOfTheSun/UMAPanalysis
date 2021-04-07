@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import networkx as nx
 import scipy.sparse
-
+import time
 
 def umap_network(df, nn, metric = 'manhattan'):
     """ """
@@ -27,7 +27,22 @@ def scaled_transition(G, nodes = None):
     scaled = scaling * A
     return scaled
 
-def eigenvalues(scaled, nodes, k = 10):
+def scaled_laplacian_opposite(G, nodes = None):
+    if nodes == None:
+        nodes = list(G.nodes())
+    else:
+        G = G.subgraph(nodes)
+
+    A = nx.adjacency_matrix(G)
+    temp = G.out_degree(weight = 'weight')
+    degree = [temp[i] for i in nodes]
+    scaling =  scipy.sparse.diags([1/np.sqrt(i) if i!=0 else 0 for i in degree])
+    identity = scipy.sparse.eye(len(nodes))
+    scaled = scaling * A * scaling
+    return scaled
+
+
+def eigenvalues(scaled, nodes, k = 150):
     eval_, evec = scipy.sparse.linalg.eigs(scaled, k = k)
 
     eval_ = np.real(eval_)
@@ -54,6 +69,7 @@ def make_undirected(G):
 def propagate(propagator, nodes, labels):
     out = []
     out_time = []
+
     for i,x in enumerate(labels.columns):
         start = time.time()
         v = scipy.sparse.csc_matrix(labels.loc[list(nodes), x].values.reshape(-1, 1))
@@ -70,12 +86,26 @@ def propagate(propagator, nodes, labels):
     return df, df_time
 
 
+def random_walk(transition, nodes, labels, steps, restart):
+    out = []
+    out_time = []
+
+    propagator = scipy.sparse.csr_matrix((len(nodes), len(nodes)))
+    n_step_transition = restart *  scipy.sparse.eye(len(nodes))
+    for i in range(steps):
+        propagator += n_step_transition
+        n_step_transition = (1-restart) * transition * n_step_transition
+
+    df, df_time = propagate(propagator, nodes, labels)
+    return df, df_time
+
+
 def nearest_neighbor(G,labels):
     out = {}
     for node in G.nodes():
         neighbors = list(G[node].keys())
         neighbor_labels = labels.loc[neighbors]
-
+        neighbors = neighbor_labels[neighbor_labels > 0].index
         if len(neighbors) > 0:
             nearest_neighbor = max(neighbors, key=lambda x: G[node][x]['weight'])
             prediction = labels.loc[nearest_neighbor]
