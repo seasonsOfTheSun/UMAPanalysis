@@ -18,7 +18,7 @@ features -= 15.0
 features = features.fillna(0.0)
 
 names = metadata.compound_name.unique()
-
+metadata['NAME'] = metadata.compound_name
 
 metadata.set_index("compound_name", drop = False, inplace=True)
 
@@ -36,6 +36,6 @@ for i in gct.col_metadata_df.cell_line_name.duplicated():
 features.columns = gct.col_metadata_df.cell_line_name + np.array(out)
 
 
-metadata#.to_csv("metadata.csv")
-features#.to_csv("features.csv")
-names# pd.Series(names).to_csv("names.csv", index=None)
+features.to_csv("data/intermediate/cell_line/features.csv")
+metadata.to_csv("data/intermediate/cell_line/metadata.csv")
+pd.Series(names).to_csv("data/intermediate/cell_line/drug_names.csv", index = None)

@@ -6,9 +6,9 @@
 import os
 import pandas as pd
 
-drug_df = pd.read_csv("chemical_annotations.csv").set_index("BROAD_ID")
+drug_df = pd.read_csv("data/raw/morphological_profiles/chemical_annotations.csv").set_index("BROAD_ID")
 to_type = (drug_df.CPD_NAME_TYPE).to_dict().get
-
+""" 
 plates = os.listdir("profiles.dir/")
 out = []
 for plate in plates:
@@ -16,8 +16,8 @@ for plate in plates:
     out.append(df[~(df.Metadata_broad_sample.map(to_type) == 'BROAD_CPD_ID')])
 morpho_df = pd.concat(out)
 #morpho_df.to_csv("known_drug_morphology.csv")
-
-#morpho_df = pd.read_csv("known_drug_morphology.csv", index_col = 0)
+"""
+morpho_df = pd.read_csv("data/raw/morphological_profiles/known_drug_morphology.csv", index_col = 0)
 
 
 morpho_df["Metadata_pert_mfc_id"] = morpho_df["Metadata_pert_mfc_id"].fillna("DMSO")
@@ -47,6 +47,8 @@ metadata = morpho_df[metadata].join(drug_df_select)
 features.to_csv("data/intermediate/morphological/features.csv")
 metadata.to_csv("data/intermediate/morphological/metadata.csv")
 pd.Series(metadata.CPD_NAME.dropna().unique()).to_csv("data/intermediate/morphological/drug_names.csv", index = None)
+
+metadata["NAME"] = metadata.CPD_NAME.fillna("DMSO")
 
 ### features_unscaled.to_csv("data/intermediate/morphological/features_unscaled.csv")
 ### y.to_csv("data/intermediate/morphological/labels.csv")
