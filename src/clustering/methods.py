@@ -10,6 +10,86 @@ cmap_outer = {"black":"#000000",
 "dark-pastel-green": "#20bf55ff", 
 "orchid-pink": "#f6c0d0ff"}
 
+import sklearn.metrics
+
+class DataSet:
+""" Helper dataset tto wrap a pair of dataframes containing the dataponts and the labels from the datasets, allowing them to be quickly saved and loaded."""
+    def __init__(self):
+        self.data
+        self.labels
+
+def load_from_file(self, datafile, labelfile, column = "MeSH"):
+    data  = pd.read_csv(datafile,   index_col = 0)
+    labelfile = pd.read_csv(labelfile, index_col = 0)
+    labels = labelfile[column]
+    DataSet(data, labels)
+
+def from_syntheticdataset(self, syntheticdataset):
+    labels = syntheticdataset.MoA
+    data = syntheticdata.X
+    DataSet(data, labels)
+        
+class ClusteringMethodType:
+    
+    def __init__(self, name, color):
+        self.name = name
+        self.color = color
+
+class ClusteringMethod:
+    
+    def __init__(self, methodtype, name_specific, function):
+        self.methodtype = methodtype
+        self.name_specific = name_specific
+        self.function = function
+
+    def cluster(self, dataset, scoring_method = sklearn.metrics.adjusted_rand_score):
+        start_time = time.time()
+        self.labels = self.function(dataset.data)
+        end_time = time.time()
+        evaluation_time = end_time - start_time
+        self.labels = self.labels.reindex(dataset.data.index)
+        score = scoring_method(self.labels, dataset.labels)
+        return score, evaluation_time
+        
+    def cluster_series(self, dataset_series):
+        score_series = []
+        time_series = []
+        for dataset in dataset_series.datasets:
+            #try:
+            if True:
+                score, evaluation_time = self.cluster(dataset)
+                score_series.append(score)
+                time_series.append(evaluation_time)
+            if False:
+                
+            #except Exception:
+                score_series.append(np.nan)
+                time_series.append(np.nan)
+
+        
+        score_series = pd.Series(score_series, index = dataset_series.value_range)
+        score_series.index.name = attr_description[dataset_series.attr]
+
+        time_series = pd.Series(time_series, index = dataset_series.value_range)
+        time_series.index.name = attr_description[dataset_series.attr] 
+        
+        return score_series, time_series
+
+def evaluate(clustering_methods, dataset_series):
+    out = {}
+    out_time = {}
+    
+    # Gets the result of each clustering method on each individual dataset withing the series
+    # to make a full table showing how each clustering method's performance decays
+    for clustering_method in clustering_methods:
+        temp_score,temp_time  = clustering_method.cluster_series(dataset_series)
+        out[clustering_method.name_specific] = temp_score
+        out_time[clustering_method.name_specific] = temp_time
+        
+    score_df = pd.concat(out, axis = 1)# index = dataset_series.value_range)
+    time_df = pd.concat(out_time, axis= 1)# index = dataset_series.value_range)
+    
+    return score_df, time_df
 
 
 
@@ -32,7 +112,7 @@ optics_type = ClusteringMethodType("Optics",  cmap_outer["turquoise"])
 
 
 # Spectral Clustering
-def spectral_cluster(X, i)
+def spectral_cluster(X, i):
     model = sklearn.cluster.SpectralClustering(n_clusters=i)
     clusters = model.fit_predict(X)
     return pd.Series(clusters, index = X.index)
@@ -70,7 +150,7 @@ def louvain(X):
     G = umap_network(X)
     return pd.Series(community.community_louvain.best_partition(G))
 
-lvtype = ClusteringMethodType('Louvain', cmap_outer[""])
+lvtype = ClusteringMethodType('Louvain', cmap_outer["razzmatazz"])
 
 
 # Autoencoder
@@ -134,17 +214,18 @@ clustering_methods = []
 for i in range(2,10):
     clustering_methods.append(ClusteringMethod(autoencode_type, 
                                                f"{i}-Dimensional Autencoder",
-                                                lambda X:autencoded_clustering(X, encoding_dim = i)))
+                                                lambda X:autencoded_clustering(X, encoding_dim = i))
+                             )
 
 for i in range(1,10):
     clustering_methods.append(ClusteringMethod(sc_type, 
                                                f"Spectral Clustering {i} Dimensions",
                                                 lambda X:spectral_cluster(X, i))
                              )
-    
+
 for i in range(1,20):
-    clustering_methods.append(ClusteringMethod(kmeans_type, 
-                                               "k-Means {i}", 
+    clustering_methods.append(ClusteringMethod(kmeans_type,
+                                               "k-Means {i}",
                                                 lambda X:kmeans(X, i))
                              )
 
@@ -163,3 +244,5 @@ clustering_methods.append(ClusteringMethod(gmtype,
                                             greedyModularity
                                             )
                          )
+
+clustering_method_dict = {c.name_specific:c for c in clustering_methods}
