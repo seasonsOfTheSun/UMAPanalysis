@@ -210,7 +210,10 @@ class SyntheticDataSetSeries:
 
 def load(foldername):
 
-    parameterdict = json.load(open(f"{foldername}/parameters.json",'w'))
+    parameterdict = json.load(open(f"{foldername}/parameters.json"))
+
+    fp = open(f"{foldername}/transform_dataset.txt")
+    transform = fp.read()
 
     start_dataset = SyntheticDataSet(parameterdict['n_clusters'],
                                      parameterdict['dimension'],
@@ -220,14 +223,11 @@ def load(foldername):
                                      parameterdict['ellipticity'],
                                      parameterdict['scale_range'],
                                      parameterdict['center_d_range'],
-                                     parameterdict['size_range'], 
-                                     parameterdict['transform_dataset'])
+                                     parameterdict['size_range'],
+                                     transform_dataset = transform)
 
     
     n_trials = parameterdict['n_trials']
-
-    fp = open(f"{foldername}/transform_dataset.txt")
-    dataset.transform_dataset = fp.read()
 
     dataset_series = SyntheticDataSetSeries(start_dataset,
                                             parameterdict['attr'],
@@ -238,9 +238,10 @@ def load(foldername):
     dataset_series.make_series()
     
     for i in range(n_trials):
-        dataset = dataset_series.datasets[i]
-        dataset.X = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
-        dataset.MoA = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
+
+        dataset_series.datasets[i].X = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
+        dataset_series.datasets[i].MoA = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
+    return dataset_series
 
 # Sample to see inter-class distances    
 def weight2dist(u,v,d):
