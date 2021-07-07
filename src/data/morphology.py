@@ -46,7 +46,7 @@ metadata = morpho_df[metadata].join(drug_df_select)
 
 features.to_csv("data/intermediate/morphological/features.csv")
 metadata.to_csv("data/intermediate/morphological/metadata.csv")
-pd.Series(metadata.CPD_NAME.dropna().unique()).to_csv("data/intermediate/morphological/drug_names.csv", index = None)
+metadata.CPD_NAME.to_csv("data/intermediate/morphological/drug_names.csv", header = None)
 
 metadata["NAME"] = metadata.CPD_NAME.fillna("DMSO")
 

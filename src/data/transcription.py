@@ -31,4 +31,4 @@ metadata["NAME"] = data.col_metadata_df.pert_desc
 
 features.to_csv("data/intermediate/transcriptional/features.csv")
 metadata.to_csv("data/intermediate/transcriptional/metadata.csv")
-pandas.Series(names).to_csv("data/intermediate/transcriptional/drug_names.csv", index = None)
+pandas.Series(names).to_csv("data/intermediate/transcriptional/drug_names.csv", header = None)
