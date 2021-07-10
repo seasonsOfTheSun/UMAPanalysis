@@ -1,4 +1,5 @@
 import sklearn.metrics
+import networkx as nx
 import time
 import numpy
 import pandas
@@ -22,22 +23,32 @@ cmap_outer = {"black":"#000000",
 
 
 class RealDataSet:
-    def __init__(self, data, labels):
+    def __init__(self, data, labels, network, network_evaluation_time):
         self.data   = data
         self.labels = labels
+        self.network = network
+        self.network_evaluation_time = network_evaluation_time
 
-def load_from_file(datafile, labelfile, column = "MeSH"):
+def load_from_file(datafile, labelfile, networkfile, networkfile_et, column = "MeSH"):
     data  = pandas.read_csv(datafile,   index_col = 0)
     labelfile = pandas.read_csv(labelfile, index_col = 0)
     assert (data.index == labelfile.index).all()
     labels = labelfile[column]
-    return RealDataSet(data, labels)
+    network = nx.read_gml(networkfile)
+    
+    fp = open(networkfile_et)
+    network_evaluation_time = float(fp.read().strip())
+    fp.close()
+    
+    return RealDataSet(data, labels, network, network_evaluation_time)
+
         
 class ClusteringMethodType:
     
-    def __init__(self, name, color):
+    def __init__(self, name, color, network_method = False):
         self.name = name
         self.color = color
+        self.network_method = network_method
 
 class ClusteringMethod:
     
@@ -46,28 +57,48 @@ class ClusteringMethod:
         self.name_specific = name_specific
         self.function = function
 
-    def cluster(self, dataset, scoring_method = sklearn.metrics.adjusted_rand_score):
+
+    def cluster_data(self, data):
+        
         start_time = time.time()
-        self.labels = self.function(dataset.data)
+        self.labels = self.function(data) 
         end_time = time.time()
-        evaluation_time = end_time - start_time
+        self.evaluation_time = end_time - start_time        
+
+
+    def cluster_network(self, network):
+        
+        start_time = time.time()
+        self.labels = self.function(network)
+        end_time = time.time()
+        self.evaluation_time = end_time - start_time 
+
+            
+    def cluster(self, dataset, scoring_method = sklearn.metrics.adjusted_rand_score):
+
+        if self.methodtype.network_method:
+            self.cluster_network(dataset.network)
+            self.evaluation_time += dataset.network_evaluation_time
+        else:
+            self.cluster_data(dataset.data)
+
+
         self.labels = self.labels.reindex(dataset.labels.index)
         masked = self.labels.isna() | dataset.labels.isna()
         score = scoring_method(self.labels[~masked], dataset.labels[~masked])
-        return score, evaluation_time
+        
+        return score, self.evaluation_time
         
     def cluster_series(self, dataset_series):
         score_series = []
         time_series = []
         for dataset in dataset_series.datasets:
-            #try:
+
             if True:
                 score, evaluation_time = self.cluster(dataset)
                 score_series.append(score)
                 time_series.append(evaluation_time)
             if False:
-                
-            #except Exception:
                 score_series.append(numpy.nan)
                 time_series.append(numpy.nan)
 
@@ -92,7 +123,7 @@ def evaluate(clustering_methods, dataset_series):
         out_time[clustering_method.name_specific] = temp_time
         
     score_df = pandas.concat(out, axis = 1)# index = dataset_series.value_range)
-    time_df = pandas.concat(out_time, axis= 1)# index = dataset_series.value_range)
+    time_df = pandas.concat(out_time, axis = 1)# index = dataset_series.value_range)
     
     return score_df, time_df
 
@@ -139,24 +170,22 @@ def umap_network(X):
     G = nx.from_scipy_sparse_matrix(G)
     return nx.relabel_nodes(G, dict(enumerate(X.index)).get)
 
-def greedyModularity(X):
-    G = umap_network(X)
+def greedyModularity(G):
     nodes = G.nodes()
     clusters = nx.community.modularity_max.greedy_modularity_communities(G)
     df = pandas.DataFrame([[i in a for a in clusters] for i in  nodes])
     df.index = nodes
     return df.idxmax(axis = 1)
         
-gmtype = ClusteringMethodType('GreedyModularity', cmap_outer["medium-purple"])
+gmtype = ClusteringMethodType('GreedyModularity', cmap_outer["medium-purple"], network_method = True)
 
 
 
 import community.community_louvain
-def louvain(X):
-    G = umap_network(X)
+def louvain(G):
     return pandas.Series(community.community_louvain.best_partition(G))
 
-lvtype = ClusteringMethodType('Louvain', cmap_outer["razzmatazz"])
+lvtype = ClusteringMethodType('Louvain', cmap_outer["razzmatazz"], network_method = True)
 
 
 # Autoencoder
@@ -217,13 +246,13 @@ autoencode_type = ClusteringMethodType("Autoencode",  cmap_outer["princeton-oran
     
 clustering_methods = []
 
-for i in range(2,10):
+for i in range(2,3):
     clustering_methods.append(ClusteringMethod(autoencode_type, 
                                                f"{i}-Dimensional Autencoder",
                                                 lambda X:autencoded_clustering(X, encoding_dim = i))
                              )
 
-for i in range(1,10):
+for i in range(8,10):
     clustering_methods.append(ClusteringMethod(sc_type, 
                                                f"Spectral Clustering {i} Dimensions",
                                                 lambda X:spectral_cluster(X, i))

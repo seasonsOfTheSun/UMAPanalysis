@@ -1,12 +1,23 @@
 import pandas as pd
 import numpy as np
 import string
+import time
 
 import os
 import json
 
 # Misc. utils.
 def randstring():return "".join(np.random.choice(list(string.ascii_lowercase), (10,)))
+
+import networkx as nx
+import umap
+import random
+def umap_network(X):
+    rndstate = np.random.RandomState(10)
+    nodes = list(X.index)
+    G,_,_ = umap.umap_.fuzzy_simplicial_set(X/X.std(), 10, rndstate, 'manhattan')
+    G = nx.from_scipy_sparse_matrix(G)
+    return nx.relabel_nodes(G, dict(enumerate(X.index)).get)
 
 
 # Make clusters 
@@ -66,27 +77,28 @@ class SyntheticDataSet:
 
 
         # Join into dataframes
-        self.X = pd.concat(out)
-        
-        
-        self.MoA = np.concatenate([[i]*v for i,v in enumerate(self.size)])
+        self.data= pd.concat(out)
+        self.labels = np.concatenate([[i]*v for i,v in enumerate(self.size)])
     
         # Consistent names for columns and indices
-        self.elementnames = [randstring() for i in range(len(self.X.index))]
-        self.X.index = self.elementnames
-        self.original_features = [randstring() for i in range(len(self.X.columns))] 
-        
+        self.elementnames = [randstring() for i in range(len(self.data.index))]
+        self.data.index = self.elementnames
+        self.original_features = [randstring() for i in range(len(self.data.columns))]
 
-        
-        self.X.columns = self.original_features
-        self.MoA = pd.Series(self.MoA, index = self.elementnames)
+
+        self.data.columns = self.original_features
+        self.labels = pd.Series(self.labels, index = self.elementnames)
         
                 
-        self.X = self.X.sample(frac=1) # re-order the datapoints soo that nothing 
+        self.data = self.data.sample(frac=1) # re-order the datapoints soo that nothing 
                                      # can be accidentally inferred form their ordering.
             
-        exec(self.transform_dataset) # apply a nonlinear transform to creat a new set od species
-
+        exec(self.transform_dataset) # apply a nonlinear transform to creat a new set of features
+        
+        start_time = time.time()
+        self.network = umap_network(self.data)
+        end_time = time.time()
+        self.network_evaluation_time = end_time - start_time
 
 
 # Add nonlinear features
@@ -166,7 +178,7 @@ class SyntheticDataSetSeries:
             copied_dataset.make_dataset()
             out.append(copied_dataset)
         self.datasets = out
-        
+
     def make_series(self):
         seriesmaker = series_type[self.attr]
         if seriesmaker == 'mean':
@@ -178,7 +190,7 @@ class SyntheticDataSetSeries:
 
         os.makedirs(foldername, exist_ok = True)
         dataset = self.start_dataset
-        
+
         parameterdict = {'n_clusters':dataset.n_clusters,
         'dimension':dataset.dimension,
         'center_d':dataset.center_d,
@@ -193,7 +205,7 @@ class SyntheticDataSetSeries:
         'center_d_range':dataset.center_d_range,
         'size_range':dataset.size_range,
         'n_trials':self.n_trials}
-    
+
         fp = open(f"{foldername}/parameters.json",'w')
         json.dump(parameterdict, fp)
         fp.close()
@@ -205,8 +217,8 @@ class SyntheticDataSetSeries:
         if save_tabular_data == True:
             for i, dataset in enumerate(self.datasets):
                 os.makedirs(f"{foldername}/dataset_{i}", exist_ok = True)
-                dataset.X.to_csv(f"{foldername}/dataset_{i}/features.csv")
-                dataset.MoA.to_csv(f"{foldername}/dataset_{i}/labels.csv")
+                dataset.data.to_csv(f"{foldername}/dataset_{i}/features.csv")
+                dataset.labels.to_csv(f"{foldername}/dataset_{i}/labels.csv")
 
 def load(foldername):
 
@@ -239,8 +251,8 @@ def load(foldername):
     
     for i in range(n_trials):
 
-        dataset_series.datasets[i].X = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
-        dataset_series.datasets[i].MoA = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
+        dataset_series.datasets[i].data = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
+        dataset_series.datasets[i].labels = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
     return dataset_series
 
 # Sample to see inter-class distances    
@@ -248,22 +260,22 @@ def weight2dist(u,v,d):
     weight = d['weight']
     return 1/weight - 1
 
-if True:
+if False:
 
     n_clusters = 10
-    dimension = 100
+    dimension = 10
     center_d = 1
     scale = 0.1
     size = 30
     ellipticity = 5
     size_range = 0
     
-    attr = 'size'
-    attr_start = 5
-    attr_range = 200
-    n_trials = 20
+    attr = 'scale'
+    attr_start = 0.1
+    attr_range = 2.1
+    n_trials = 10
 
-    dataset =     SyntheticDataSet(n_clusters, 
+    dataset =     SyntheticDataSet(n_clusters,
                                    dimension, 
                                    center_d,
                                    scale,
@@ -272,9 +284,9 @@ if True:
                                    size_range=size_range)
 
     dataset_series = SyntheticDataSetSeries(dataset,
-                                                attr, 
-                                                attr_start, 
-                                                attr_range, 
-                                                n_trials = n_trials)
+                                            attr,
+                                            attr_start,
+                                            attr_range,
+                                            n_trials = n_trials)
     
     dataset_series.make_series()
