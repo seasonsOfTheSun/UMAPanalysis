@@ -17,7 +17,7 @@ cmap_outer = {"black":"#000000",
 "orchid-pink": "#f6c0d0ff"}
 
 
-""" Helper dataset tto wrap a pair of dataframes contain
+""" Helper dataset to wrap a pair of dataframes contain
     ing the dataponts and the labels from the datasets,
      allowing them to be quickly saved and loaded."""  
 
@@ -143,8 +143,8 @@ kmeans_type = ClusteringMethodType("k-Means", "#000000")
 def optics(X):
     model = sklearn.cluster.OPTICS(min_samples=10, eps = 1000)
     clusters = model.fit_predict(X)
-    return pandas.Series(clusters, index = X.index)
-    
+    clusters = pandas.Series(clusters, index = X.index)
+    return clusters.replace(-1, np.nan)    
 optics_type = ClusteringMethodType("Optics",  cmap_outer["turquoise"])
 
 
