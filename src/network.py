@@ -8,8 +8,9 @@ from UMAP_analysis.core import umap_network
 
 
 dataset = sys.argv[1]
-n = int(sys.argv[2])
-metric = sys.argv[3]
+metric = sys.argv[2]
+n = int(sys.argv[3])
+
 
 df = pd.read_csv(f"data/intermediate/{dataset}/features.csv", index_col=0)
 
