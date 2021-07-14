@@ -144,7 +144,7 @@ def optics(X):
     model = sklearn.cluster.OPTICS(min_samples=10, eps = 1000)
     clusters = model.fit_predict(X)
     clusters = pandas.Series(clusters, index = X.index)
-    return clusters.replace(-1, np.nan)    
+    return clusters.replace(-1, numpy.nan)    
 optics_type = ClusteringMethodType("Optics",  cmap_outer["turquoise"])
 
 
