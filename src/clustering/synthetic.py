@@ -136,18 +136,13 @@ typeof_parameter = {'n_clusters':int, 'dimension':int,
 
 class SyntheticDataSetSeries:
 
-    def __init__(self,start_dataset, attr, attr_start, attr_range, n_trials = 6):
+    def __init__(self,start_dataset, attr, value_range):
         
         self.start_dataset = start_dataset
         self.attr = attr
-        self.attr_start = attr_start
-        self.attr_range = attr_range
-        self.n_trials = n_trials
         
-        self.value_range = np.linspace(self.attr_start, 
-                        self.attr_start + self.attr_range, 
-                        self.n_trials
-                       )
+        self.value_range = value_range
+
         type_ = typeof_parameter[self.attr]
         self.value_range = [type_(i) for i in self.value_range]
     
@@ -197,14 +192,12 @@ class SyntheticDataSetSeries:
         'scale':dataset.scale,
         'size':dataset.size,
         'attr':self.attr,
-        'attr_start':self.attr_start,
-        'attr_range':self.attr_range,
+        'value_range':list(self.value_range),
         'ellipticity':dataset.ellipticity,
         'size_range':dataset.size_range,
         'scale_range':dataset.scale_range,
         'center_d_range':dataset.center_d_range,
-        'size_range':dataset.size_range,
-        'n_trials':self.n_trials}
+        'size_range':dataset.size_range}
 
         fp = open(f"{foldername}/parameters.json",'w')
         json.dump(parameterdict, fp)
@@ -241,16 +234,11 @@ def load(foldername):
     
     n_trials = parameterdict['n_trials']
 
-    dataset_series = SyntheticDataSetSeries(start_dataset,
-                                            parameterdict['attr'],
-                                            parameterdict['attr_start'],
-                                            parameterdict['attr_range'],
-                                            n_trials = n_trials)
-
+    dataset_series = SyntheticDataSetSeries(start_dataset,parameterdict['attr'],np.array(parameterdict['value_range']))
+    
     dataset_series.make_series()
     
     for i in range(n_trials):
-
         dataset_series.datasets[i].data = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
         dataset_series.datasets[i].labels = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
     return dataset_series
@@ -274,6 +262,7 @@ if False:
     attr_start = 0.1
     attr_range = 2.1
     n_trials = 10
+    value_range = np.linspace(attr_start, attr_range, n_trials)
 
     dataset =     SyntheticDataSet(n_clusters,
                                    dimension, 
@@ -285,8 +274,9 @@ if False:
 
     dataset_series = SyntheticDataSetSeries(dataset,
                                             attr,
-                                            attr_start,
-                                            attr_range,
-                                            n_trials = n_trials)
+                                            value_range)
+
     
-    dataset_series.make_series()
+    dataset_series.make_values()
+
+
