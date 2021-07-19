@@ -87,20 +87,19 @@ class ClusteringMethod:
         masked = self.labels.isna() | dataset.labels.isna()
         score = scoring_method(self.labels[~masked], dataset.labels[~masked])
         
-        return score, self.evaluation_time
+        return score, self.evaluation_time, sum(masked)
         
     def cluster_series(self, dataset_series):
         score_series = []
         time_series = []
+        n_series = []
         for dataset in dataset_series.datasets:
 
             if True:
-                score, evaluation_time = self.cluster(dataset)
+                score, evaluation_time, n = self.cluster(dataset)
                 score_series.append(score)
                 time_series.append(evaluation_time)
-            if False:
-                score_series.append(numpy.nan)
-                time_series.append(numpy.nan)
+                n_series.append(n)
 
         
         score_series = pandas.Series(score_series, index = dataset_series.value_range)
@@ -109,24 +108,48 @@ class ClusteringMethod:
         time_series = pandas.Series(time_series, index = dataset_series.value_range)
         time_series.index.name = dataset_series.attr 
         
-        return score_series, time_series
+        n_series = pandas.Series(n_series, index = dataset_series.value_range)
+        n_series.index.name = dataset_series.attr 
+        
+        return score_series, time_series, n_series
 
-def evaluate(clustering_methods, dataset_series):
+def evaluate(clustering_methods, dataset):
     out = {}
     out_time = {}
+    out_n = {}
+
+    for clustering_method in clustering_methods:
+        temp_score,temp_time,n  = clustering_method.cluster(dataset)
+        out[clustering_method.name_specific] = temp_score
+        out_time[clustering_method.name_specific] = temp_time
+        out_n[clustering_method.name_specific] = n
+    
+    return pandas.Series(out),pandas.Series(out_time),pandas.Series(out_n)
+
+def evaluate_series(clustering_methods, dataset_series):
+    out = {}
+    out_time = {}
+    out_n = {}
     
     # Gets the result of each clustering method on each individual dataset withing the series
     # to make a full table showing how each clustering method's performance decays
     for clustering_method in clustering_methods:
-        temp_score,temp_time  = clustering_method.cluster_series(dataset_series)
+        temp_score,temp_time,temp_n  = clustering_method.cluster_series(dataset_series)
         out[clustering_method.name_specific] = temp_score
         out_time[clustering_method.name_specific] = temp_time
-        
+        out_n[clustering_method.name_specific] = temp_n
+    
     score_df = pandas.concat(out, axis = 1)# index = dataset_series.value_range)
     time_df = pandas.concat(out_time, axis = 1)# index = dataset_series.value_range)
+    n_df = pandas.concat(out_n, axis = 1)
     
-    return score_df, time_df
+    return score_df, time_df, n_df
 
+def cluster_method_dataframe(clustering_methods):
+    return pandas.DataFrame({'Name'          :{c.name_specific:c.methodtype.name for c in clustering_methods},
+           'Color'         :{c.name_specific:c.methodtype.color for c in clustering_methods},
+           'Network Method':{c.name_specific:c.methodtype.network_method for c in clustering_methods}})
+    
 
 import sklearn.cluster
 
@@ -195,32 +218,16 @@ from keras import layers
 def autoencode(df, encoding_dim = 2, validation_split = 0.1):
     n = len(df.columns)
     df = (df - df.min()) / (df.max() - df.min())
-    # This is the size of our encoded representations
-    # This is our input image
     input_img = keras.Input(shape=(n,))
-    # "encoded" is the encoded representation of the input
     encoded = layers.Dense(encoding_dim, activation='relu')(input_img)
-    # "decoded" is the lossy reconstruction of the input
     decoded = layers.Dense(n, activation='sigmoid')(encoded)
-    # This model maps an input to its reconstruction
     autoencoder = keras.Model(input_img, decoded)
-
-    # This model maps an input to its encoded representation
     encoder = keras.Model(input_img, encoded)
-
-    ####|   As well as the decoder model   |####
-
-    # This is our encoded (32-dimensional) input
     encoded_input = keras.Input(shape=(encoding_dim,))
-    # Retrieve the last layer of the autoencoder model
     decoder_layer = autoencoder.layers[-1]
-    # Create the decoder model
     decoder = keras.Model(encoded_input, decoder_layer(encoded_input))
-    #Now let's train our autoencoder to reconstruct MNIST digits.
-    #First, we'll configure our model to use a per-pixel binary crossentropy loss, and the Adam optimizer:
     
     autoencoder.compile(optimizer='adam', loss='mse')
-
     autoencoder.fit(df.values, df.values,
                     epochs=1000,
                     batch_size=256,
