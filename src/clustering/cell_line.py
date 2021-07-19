@@ -1,3 +1,7 @@
+import synthetic
+import methods
+import numpy as np
+
 cell_line_dataset = methods.load_from_file("../../data/intermediate/cell_line/features.csv",
                                   "../../data/intermediate/cell_line/labels.csv",
                                   "../../networks/cell_line/metric_manhattan_nneighbors_10.gml",
@@ -6,6 +10,7 @@ cell_line_dataset = methods.load_from_file("../../data/intermediate/cell_line/fe
                                  )
 
 metadata_df = methods.clustering_method_dataframe(methods.clustering_methods)
+metadata_df.index.name = "clustering methods"
 score_df, time_df, n_df = methods.evaluate(methods.clustering_methods, dcell_line_dataset)
 
 import os

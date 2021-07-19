@@ -53,6 +53,7 @@ dataset_series.make_series()
 
 score_df, time_df, n_df = methods.evaluate_series(methods.clustering_methods, dataset_series)
 metadata_df = methods.clustering_method_dataframe(methods.clustering_methods)
+metadata_df.index.name = "clustering methods"
 
 import os
 dataset_series.save("src/clustering/scale")

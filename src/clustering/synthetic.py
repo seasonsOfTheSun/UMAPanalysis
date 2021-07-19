@@ -12,10 +12,10 @@ def randstring():return "".join(np.random.choice(list(string.ascii_lowercase), (
 import networkx as nx
 import umap
 import random
-def umap_network(X):
-    rndstate = np.random.RandomState(10)
+def umap_network(X, nneighbors = 10, metric = 'euclidean'):
+    rndstate = np.random.RandomState(nneighbors)
     nodes = list(X.index)
-    G,_,_ = umap.umap_.fuzzy_simplicial_set(X/X.std(), 10, rndstate, 'manhattan')
+    G,_,_ = umap.umap_.fuzzy_simplicial_set(X/X.std(), 10, rndstate, metric)
     G = nx.from_scipy_sparse_matrix(G)
     return nx.relabel_nodes(G, dict(enumerate(X.index)).get)
 
@@ -90,13 +90,16 @@ class SyntheticDataSet:
         self.labels = pd.Series(self.labels, index = self.elementnames)
         
                 
-        self.data = self.data.sample(frac=1) # re-order the datapoints soo that nothing 
+        self.data = self.data.sample(frac=1) # re-order the datapoints so that nothing 
                                      # can be accidentally inferred form their ordering.
             
         exec(self.transform_dataset) # apply a nonlinear transform to creat a new set of features
         
+        metric = 'euclidean'
+        nneighbors = 10
+        
         start_time = time.time()
-        self.network = umap_network(self.data)
+        self.network = umap_network(self.data, nneighbors = nneighbors, metric = metric)
         end_time = time.time()
         self.network_evaluation_time = end_time - start_time
 
@@ -212,6 +215,18 @@ class SyntheticDataSetSeries:
                 os.makedirs(f"{foldername}/dataset_{i}", exist_ok = True)
                 dataset.data.to_csv(f"{foldername}/dataset_{i}/features.csv")
                 dataset.labels.to_csv(f"{foldername}/dataset_{i}/labels.csv")
+                
+                metric='euclidean'
+                nneighbors = 10
+                
+                for edge in dataset.network.edges():
+                    dataset.network.edges()[edge]['weight'] = float(dataset.network.edges()[edge]['weight'])
+                
+                nx.write_gml(dataset.network,f"{foldername}/dataset_{i}/metric_{metric}_nneighbors_{nneighbors}.gml")
+                fp = open(f"{foldername}/dataset_{i}/evaluation_time_metric_{metric}_nneighbors_{nneighbors}.gml", 'w')
+                fp.write(str(dataset.network_evaluation_time))
+                fp.close()
+
 
 def load(foldername):
 
@@ -240,7 +255,7 @@ def load(foldername):
     
     for i in range(n_trials):
         dataset_series.datasets[i].data = pd.read_csv(f"{foldername}/dataset_{i}/features.csv", index_col = 0)
-        dataset_series.datasets[i].labels = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0)
+        dataset_series.datasets[i].labels = pd.read_csv(f"{foldername}/dataset_{i}/labels.csv", index_col = 0, header = None)
     return dataset_series
 
 # Sample to see inter-class distances    

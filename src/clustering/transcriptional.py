@@ -1,3 +1,7 @@
+import synthetic
+import methods
+import numpy as np
+
 transcriptional_dataset = methods.load_from_file("../../data/intermediate/transcriptional/features.csv",
                                   "../../data/intermediate/transcriptional/labels.csv",
                                   "../../networks/transcriptional/metric_manhattan_nneighbors_10.gml",
@@ -7,6 +11,7 @@ transcriptional_dataset = methods.load_from_file("../../data/intermediate/transc
 
 
 metadata_df = methods.clustering_method_dataframe(methods.clustering_methods)
+metadata_df.index.name = "clustering methods"
 score_df, time_df, n_df = methods.evaluate(methods.clustering_methods, transcriptional_dataset)
 
 import os

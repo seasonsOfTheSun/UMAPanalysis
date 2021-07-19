@@ -1,3 +1,7 @@
+import synthetic
+import methods
+import numpy as np
+
 morphological_dataset = methods.load_from_file("../../data/intermediate/morphological/features.csv",
                                   "../../data/intermediate/morphological/labels.csv",
                                   "../../networks/morphological/metric_manhattan_nneighbors_10.gml",
@@ -6,6 +10,7 @@ morphological_dataset = methods.load_from_file("../../data/intermediate/morpholo
                                  )
                                  
 metadata_df = methods.clustering_method_dataframe(methods.clustering_methods)
+metadata_df.index.name = "clustering methods"
 score_df, time_df, n_df = methods.evaluate(methods.clustering_methods, morphological_dataset)
 
 import os
