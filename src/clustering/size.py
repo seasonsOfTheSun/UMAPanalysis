@@ -11,7 +11,7 @@ ellipticity = 5
 size_range = 0
 
 attr = 'size'
-value_range = np.logspace(0, 4, 5)
+value_range = np.logspace(1, 5, 5)
 
 transform_dataset = """amplitude = 1
 period = 10
