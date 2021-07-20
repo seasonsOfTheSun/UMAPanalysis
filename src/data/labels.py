@@ -1,3 +1,5 @@
+import pandas as pd
+import networkx as nx
 
 def max_connected_component(G):
     subs = nx.weakly_connected_component_subgraphs(G)
@@ -28,17 +30,18 @@ def descendants_in(G, node):
     
     return out
 
-def cid_to_terms(G):
+def name_to_terms(G):
     """ Use the term hierarchy G to get the terms annotated to each cid"""
     out = {}
     for term in G.nodes(): 
-         try: 
-             for cid in G.nodes()[term]['drugs']: 
-                 try: 
-                     out[cid] |= {term} 
-                 except KeyError: 
-                     out[cid] = {term} 
-         except KeyError: 
+        try: 
+            for namecid in G.nodes()[term]['drugs']: 
+                name = namecid.split(":")[0]
+                try: 
+                    out[name] |= {term} 
+                except KeyError: 
+                    out[name] = {term} 
+        except KeyError: 
              pass
     return out
 
@@ -66,17 +69,32 @@ def lowest_in_hierarchy(G, terms):
 
 import networkx as nx
 
-G_all = nx.read_gml("data/external/All_MeSH_annotations.gml")
-G = G_all.subgraph(descendants_in(G_all, "Molecular Mechanisms of Pharmacological Action"))
+G_all = nx.read_gml("../data/external/annotation_hierarchies/Medical_Subject_Headings__MeSH_.gml")
+G = G_all.subgraph(descendants_out(G_all, "Molecular Mechanisms of Pharmacological Action"))
 
 H = G.copy()
 H = filter_n_drug_terms(G, 4)    
-H.remove_nodes_from([i for i,_ in G.in_edges('Cytochrome P-450 Enzyme Inhibitors')])
-H.remove_node('Cytochrome P-450 Enzyme Inhibitors') # not actually relevant to mechanism
-H.remove_node("Enzyme Inhibitors") # way too general
-H.remove_node("Neurotransmitter Agents")
-H.remove_node('Neurotransmitter Uptake Inhibitors')
-#H.remove_node("Membrane Transport Modulator")
+try:
+    H.remove_nodes_from([i for i,_ in G.in_edges('Cytochrome P-450 Enzyme Inhibitors')])
+except:
+    pass
+try:
+    H.remove_node('Cytochrome P-450 Enzyme Inhibitors') # not actually relevant to mechanism
+except:
+    pass
+try:
+    H.remove_node("Enzyme Inhibitors") # way too general
+except:
+    pass
+try:
+    H.remove_node("Neurotransmitter Agents")
+except:
+    pass
+try:
+    H.remove_node('Neurotransmitter Uptake Inhibitors')
+except:
+    pass
+H.remove_node("Supplementary Records")
 
 import collections
 import pandas as pd
@@ -84,35 +102,31 @@ import pandas as pd
 # calcualte frequency of different terms
 # across all selected drugs
 freq = collections.Counter()
-cid_to_candidate_terms = {}
-for cid, terms in cid_to_terms(H).items():
+name_to_candidate_terms = {}
+for name, terms in name_to_terms(H).items():
     temp = lowest_in_hierarchy(H, terms)
     freq.update(temp)
-    cid_to_candidate_terms[cid] = temp
+    name_to_candidate_terms[name] = temp
 
 freq = pd.Series(freq).sort_values()
 def get_most_frequent(terms):
-    i = freq.loc[terms].argmax()
-    return terms[i]
+    return freq.loc[terms].argmax()
 
-cid_to_terms = {}
-for cid, terms in cid_to_candidate_terms.items():
-    cid_to_terms[cid] =  get_most_frequent(terms)
-cid_to_terms = pd.Series(cid_to_terms)
-cid_to_terms.name = "MeSH"
+name_to_term = {}
+for name, terms in name_to_candidate_terms.items():
+    name_to_term[name] =  get_most_frequent(terms)
+
+name_to_term = pd.Series(name_to_term)
+name_to_term.name = "MeSH"
 
 folders = ["cell_line", "transcriptional", "morphological"]
-
 for folder in folders:
-    drug_names = pd.read_csv(f"data/intermediate/{folder}/drug_names.csv", header = None, index_col = 0)
-    cid_names = pd.read_csv("data/external/cid_to_names.csv", header = None)
-    cid_names.columns = ["NAME","CID"]
-    #cid_names.query("NAME in @drug_names")
-    cid_names.set_index("NAME", inplace = True)
-    cid_names.CID = cid_names.CID.astype('str')
-    cid_names = cid_names.join(cid_to_terms, on = 'CID')
-    label_df = drug_names.join(cid_names, on = 1)
-    
-    label_df.to_csv(f"data/intermediate/{folder}/labels.csv")
 
+    drug_names = pd.read_csv(f"../data/intermediate/{folder}/drug_names.csv", header = None)
+    drug_names.columns = ["Index", "Name"]
+    labels = drug_names.join(name_to_term, on = "Name")
+    labels.set_index("Index", inplace = True)
 
+    features = pd.read_csv(f"../data/intermediate/{folder}/features.csv", index_col = 0)
+    labels.reindex(features.index)
+    labels.to_csv(f"../data/intermediate/{folder}/labels.csv", index_col = 0)
