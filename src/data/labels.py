@@ -69,7 +69,7 @@ def lowest_in_hierarchy(G, terms):
 
 import networkx as nx
 
-G_all = nx.read_gml("../data/external/annotation_hierarchies/Medical_Subject_Headings__MeSH_.gml")
+G_all = nx.read_gml("data/external/annotation_hierarchies/Medical_Subject_Headings__MeSH_.gml")
 G = G_all.subgraph(descendants_out(G_all, "Molecular Mechanisms of Pharmacological Action"))
 
 H = G.copy()
@@ -122,11 +122,11 @@ name_to_term.name = "MeSH"
 folders = ["cell_line", "transcriptional", "morphological"]
 for folder in folders:
 
-    drug_names = pd.read_csv(f"../data/intermediate/{folder}/drug_names.csv", header = None)
+    drug_names = pd.read_csv(f"data/intermediate/{folder}/drug_names.csv", header = None)
     drug_names.columns = ["Index", "Name"]
     labels = drug_names.join(name_to_term, on = "Name")
     labels.set_index("Index", inplace = True)
 
-    features = pd.read_csv(f"../data/intermediate/{folder}/features.csv", index_col = 0)
+    features = pd.read_csv(f"data/intermediate/{folder}/features.csv", index_col = 0)
     labels.reindex(features.index)
-    labels.to_csv(f"../data/intermediate/{folder}/labels.csv", index_col = 0)
+    labels.to_csv(f"data/intermediate/{folder}/labels.csv")
