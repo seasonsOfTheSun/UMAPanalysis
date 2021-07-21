@@ -2,10 +2,10 @@ import synthetic
 import methods
 import numpy as np
 
-cell_line_dataset = methods.load_from_file("../../data/intermediate/cell_line/features.csv",
-                                  "../../data/intermediate/cell_line/labels.csv",
-                                  "../../networks/cell_line/metric_manhattan_nneighbors_10.gml",
-                                  "../../networks/cell_line/evaluation_time_metric_manhattan_nneighbors_10.gml",
+cell_line_dataset = methods.load_from_file("data/intermediate/cell_line/features.csv",
+                                  "data/intermediate/cell_line/labels.csv",
+                                  "networks/cell_line/metric_euclidean_nneighbors_10.gml",
+                                  "networks/cell_line/evaluation_time_metric_euclidean_nneighbors_10.gml",
                                   column = "MeSH"
                                  )
 

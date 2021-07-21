@@ -2,10 +2,10 @@ import synthetic
 import methods
 import numpy as np
 
-morphological_dataset = methods.load_from_file("../../data/intermediate/morphological/features.csv",
-                                  "../../data/intermediate/morphological/labels.csv",
-                                  "../../networks/morphological/metric_manhattan_nneighbors_10.gml",
-                                  "../../networks/morphological/evaluation_time_metric_manhattan_nneighbors_10.gml",
+morphological_dataset = methods.load_from_file("data/intermediate/morphological/features.csv",
+                                  "data/intermediate/morphological/labels.csv",
+                                  "networks/morphological/metric_euclidean_nneighbors_10.gml",
+                                  "networks/morphological/evaluation_time_metric_euclidean_nneighbors_10.gml",
                                   column = "MeSH"
                                  )
                                  
@@ -15,7 +15,7 @@ score_df, time_df, n_df = methods.evaluate(methods.clustering_methods, morpholog
 
 import os
 dataset_series.save("src/clustering/morphology/")
-    os.makedirs("src/clustering/morphology", exist_ok = True)
+os.makedirs("src/clustering/morphology", exist_ok = True)
 
 score_df.to_csv("src/clustering/morphology/score_df.csv")
 time_df.to_csv("src/clustering/morphology/time_df.csv")
